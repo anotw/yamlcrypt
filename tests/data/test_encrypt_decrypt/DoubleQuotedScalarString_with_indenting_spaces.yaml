@@ -1,0 +1,9 @@
+---
+some:
+  path:
+    with:
+      DoubleQuotedScalarString_with_indenting_spaces: "\
+                Blab\
+        Blevlksbhjkl"
+
+    do-not-crypt: something

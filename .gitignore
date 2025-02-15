@@ -9,3 +9,4 @@ __pycache__/
 /.venv
 /.vscode
 /yamlcrypt/__version__.py
+/.mypy_cache

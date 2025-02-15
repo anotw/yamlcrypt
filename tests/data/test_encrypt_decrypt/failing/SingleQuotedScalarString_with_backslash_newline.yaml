@@ -1,0 +1,6 @@
+---
+some:
+  path:
+    with:
+      SingleQuotedScalarString_with_backslash_newline: 'This string uses a backslas'
+    do-not-crypt: something

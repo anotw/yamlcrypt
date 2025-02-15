@@ -1,0 +1,10 @@
+---
+some:
+  path:
+    with:
+      LiteralScalarString_Keep: |+
+        This is a literal block scalar with `+`.
+        It preserves all trailing newlines.
+
+
+    do-not-crypt: something

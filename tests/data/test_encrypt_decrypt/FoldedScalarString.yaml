@@ -1,0 +1,9 @@
+---
+some:
+  path:
+    with:
+      FoldedScalarString: >
+        This is a folded block scalar.
+        It joins lines into a single paragraph.
+        But keeps newlines when there's an empty line.
+    do-not-crypt: something

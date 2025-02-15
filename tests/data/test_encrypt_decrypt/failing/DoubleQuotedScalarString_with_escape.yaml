@@ -1,0 +1,8 @@
+---
+some:
+  path:
+    with:
+      DoubleQuotedScalarString_with_escape: "This string contains escape sequences\
+        \ like \ (newline) and \\t (tab)."
+
+    do-not-crypt: something

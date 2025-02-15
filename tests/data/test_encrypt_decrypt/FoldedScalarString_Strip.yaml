@@ -1,0 +1,8 @@
+---
+some:
+  path:
+    with:
+      FoldedScalarString_Strip: >-
+        This is a folded block scalar with `-`.
+        It removes trailing newlines.
+    do-not-crypt: something

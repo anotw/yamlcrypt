@@ -1,0 +1,7 @@
+---
+some:
+  path:
+    with:
+      DoubleQuotedScalarString: "This is a double-quoted string."
+
+    do-not-crypt: something

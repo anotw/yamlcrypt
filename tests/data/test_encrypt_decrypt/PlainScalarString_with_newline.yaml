@@ -1,0 +1,7 @@
+---
+some:
+  path:
+    with:
+      PlainScalarString_with_newline: This is a plain scalar string with a newline.
+        It continues on the next line.
+    do-not-crypt: something
