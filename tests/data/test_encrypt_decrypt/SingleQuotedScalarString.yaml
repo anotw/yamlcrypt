@@ -1,0 +1,6 @@
+---
+some:
+  path:
+    with:
+      SingleQuotedScalarString: 'This is a single-quoted string.'
+    do-not-crypt: something

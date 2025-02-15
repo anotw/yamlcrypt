@@ -1,0 +1,10 @@
+---
+some:
+  path:
+    with:
+      FoldedScalarString_Keep: >+
+        This is a folded block scalar with `+`.
+        It preserves all trailing newlines.
+
+
+    do-not-crypt: something

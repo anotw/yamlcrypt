@@ -1,0 +1,7 @@
+---
+some:
+  path:
+    with:
+      SingleQuotedScalarString_with_backslash_newline: 'This string uses a backslash\
+        to escape the newline and continue on the same line.'
+    do-not-crypt: something

@@ -1,0 +1,7 @@
+---
+some:
+  path:
+    with:
+      SingleQuotedScalarString_with_newline: 'This is a single-quoted string with
+        a newline'
+    do-not-crypt: something

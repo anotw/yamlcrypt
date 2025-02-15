@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "yamlcrypt"
+description = "A simple CLI to encrypt data in yaml files with `yamlpath` and `pyrage`."
+authors = [
+    {name = "Jeremie Guichard", email = "contact@guichard.pro"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = {file = "LICENSE"}
+
+[project.urls]
+Homepage = "https://github.com/anotw/yamlcrypt"
+Issues = "https://github.com/anotw/yamlcrypt"
+
+[tool.setuptools]
+packages = "find:"
+
+[tool.setuptools.dynamic]
+dependencies = {file = "requirements.txt"}
+
+[tool.setuptools.dynamic.optional-dependencies]
+test = {file = "requirements-test.txt"}
+
+[tool.setuptools_scm]
+write_to = "yamlcrypt/__version__.py"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4"]  # Error, Formatting, Import sorting, Pyupgrade, Bugbear, Comprehensions
+ignore = ["E501", "W191"]  # Ignore line length errors (handled by formatter) and tabs
+
+[tool.ruff.format]
+indent-style = "space"
+quote-style = "double"
+line-ending = "lf"
+
+[tool.pytest.ini_options]
+pythonpath = [
+  ".",
+]

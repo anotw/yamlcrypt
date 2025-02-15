@@ -1,0 +1,11 @@
+---
+some:
+  path:
+    with:
+      LiteralScalarString: |
+        This is a literal block scalar.
+        It preserves line breaks exactly.
+        Extra newlines are kept.
+
+
+    do-not-crypt: something

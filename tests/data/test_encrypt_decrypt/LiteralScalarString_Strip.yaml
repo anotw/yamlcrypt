@@ -1,0 +1,10 @@
+---
+some:
+  path:
+    with:
+      LiteralScalarString_Strip: |-
+        This is a literal block scalar with `-`.
+        It removes trailing newlines.
+
+
+    do-not-crypt: something

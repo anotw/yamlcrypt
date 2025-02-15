@@ -1,0 +1,63 @@
+---
+some:
+  path:
+    with:
+      # 1. Plain Scalar (Unquoted)
+      PlainScalarString: This is a plain scalar string.
+      PlainScalarString_with_newline: This is a plain scalar string with a newline.
+        It continues on the next line.
+
+      # 2. Single-Quoted Scalar
+      SingleQuotedScalarString: 'This is a single-quoted string.'
+      SingleQuotedScalarString_with_escape: 'This string contains an escaped single quote: it''s safe.'
+      SingleQuotedScalarString_with_newline: 'This is a single-quoted string with a newline.
+        It continues on the next line.'
+      SingleQuotedScalarString_with_backslash_newline: 'This string uses a backslash\
+        to escape the newline and continue on the same line.'
+
+      # 3. Double-Quoted Scalar
+      DoubleQuotedScalarString: "This is a double-quoted string."
+      DoubleQuotedScalarString_with_escape: "This string contains escape sequences like \n (newline) and \t (tab)."
+      DoubleQuotedScalarString_with_newline: "This is a double-quoted string with a newline.
+        It continues on the next line."
+      DoubleQuotedScalarString_with_backslash_newline: "This string uses a backslash\
+        to escape the newline and continue on the same line."
+      DoubleQuotedScalarString_with_indenting_spaces: "\
+                Blab\
+        Blevlksbhjkl"
+
+      # 4. Literal Scalar (|)
+      LiteralScalarString: |
+        This is a literal block scalar.
+        It preserves line breaks exactly.
+        Extra newlines are kept.
+
+
+      LiteralScalarString_Keep: |+
+        This is a literal block scalar with `+`.
+        It preserves all trailing newlines.
+
+
+
+
+      LiteralScalarString_Strip: |-
+        This is a literal block scalar with `-`.
+        It removes trailing newlines.
+
+
+      # 5. Folded Scalar (>)
+      FoldedScalarString: >
+        This is a folded block scalar.
+        It joins lines into a single paragraph.
+        But keeps newlines when there's an empty line.
+
+
+      FoldedScalarString_Keep: >+
+        This is a folded block scalar with `+`.
+        It preserves all trailing newlines.
+
+
+
+      FoldedScalarString_Strip: >-
+        This is a folded block scalar with `-`.
+        It removes trailing newlines.

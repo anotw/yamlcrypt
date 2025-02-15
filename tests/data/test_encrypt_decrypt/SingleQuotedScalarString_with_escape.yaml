@@ -1,0 +1,6 @@
+---
+some:
+  path:
+    with:
+      SingleQuotedScalarString_with_escape: 'This string contains an escaped single quote: it''s safe.'
+    do-not-crypt: something

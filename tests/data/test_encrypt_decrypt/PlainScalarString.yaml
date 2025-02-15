@@ -1,0 +1,6 @@
+---
+some:
+  path:
+    with:
+      PlainScalarString: This is a plain scalar string.
+    do-not-crypt: something
