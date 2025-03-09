@@ -11,6 +11,43 @@ values are used.
 
 ## Usage
 
+### Add a recipient
+
+For `yamlcrypt` to work it will need a [config file](#config-file) with at least one recipient defined.
+
+Keys can be generated with the `age` CLI directly otherwise the `yamlcrypt` `recipient add` command
+can be used.
+
+To generate/add a key pair for the recipient `admin` use:
+
+```
+yamlcrypt --config /path/to/config.yaml recipient add admin
+yamlcrypt --config /path/to/config.yaml recipient add admin --key-file /path/to/admin.keyfile
+```
+
+> When no file already exist on the provided config file path then a default config file is generated.
+> If the file already existed the new recipient is simply added to the existing file.
+
+### Encrypt
+
+```console
+yamlcrypt --config /path/to/config.yaml encrypt file.yaml
+YAMLCRYPT_CONFIG=/path/to/config.yaml yamlcrypt encrypt file.yaml
+
+yamlcrypt --config /path/to/config.yaml encrypt --in-place file.yaml
+yamlcrypt --config /path/to/config.yaml encrypt --output encrypted.yaml file.yaml
+```
+
+### Decrypt
+
+```console
+yamlcrypt --config /path/to/config.yaml --age-key age.key decrypt file.yaml
+YAMLCRYPT_CONFIG=/path/to/config.yaml YAMLCRYPT_AGE_KEY=age.key yamlcrypt decrypt file.yaml
+
+yamlcrypt --config /path/to/config.yaml --age-key age.key decrypt --in-place file.yaml
+yamlcrypt --config /path/to/config.yaml --age-key age.key decrypt --output decrypted.yaml file.yaml
+```
+
 ### Config file
 
 Because `yamlcrypt` uses `age` asymmetric encryption, the private keys are not needed in the config
@@ -101,39 +138,3 @@ interpreted as the private key itself.
 For example for an identity / recipient with the name `age` the default variables would be:
   - `YAMLCRYPT_IDENTITIES_PATH_AGE`: The path to the private file for the identity `age`
   - `YAMLCRYPT_IDENTITIES_KEY_AGE`: The private key directly
-
-### Add a recipient
-
-For `yamlcrypt` to work it will need a config file with at least one recipient defined.
-Keys can be generated with the `age` CLI directly otherwise the `yamlcrypt` `recipient add` command
-can be used.
-
-To generate/add a key pair for the recipient `admin` use:
-
-```
-yamlcrypt --config /path/to/config.yaml recipient add admin
-yamlcrypt --config /path/to/config.yaml recipient add admin --key-file /path/to/admin.keyfile
-```
-
-> When no file already exist on the provided config file path then a default config file is generated.
-> If the file already existed the new recipient is simply added to the existing file.
-
-### Encrypt
-
-```console
-yamlcrypt --config /path/to/config.yaml encrypt file.yaml
-YAMLCRYPT_CONFIG=/path/to/config.yaml yamlcrypt encrypt file.yaml
-
-yamlcrypt --config /path/to/config.yaml encrypt --in-place file.yaml
-yamlcrypt --config /path/to/config.yaml encrypt --output encrypted.yaml file.yaml
-```
-
-### Decrypt
-
-```console
-yamlcrypt --config /path/to/config.yaml --age-key age.key decrypt file.yaml
-YAMLCRYPT_CONFIG=/path/to/config.yaml YAMLCRYPT_AGE_KEY=age.key yamlcrypt decrypt file.yaml
-
-yamlcrypt --config /path/to/config.yaml --age-key age.key decrypt --in-place file.yaml
-yamlcrypt --config /path/to/config.yaml --age-key age.key decrypt --output decrypted.yaml file.yaml
-```
