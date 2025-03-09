@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -15,13 +15,14 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 license = {file = "LICENSE"}
+dynamic = ["version", "dependencies"]
 
 [project.urls]
 Homepage = "https://github.com/anotw/yamlcrypt"
 Issues = "https://github.com/anotw/yamlcrypt"
 
-[tool.setuptools]
-packages = "find:"
+[tool.setuptools.packages]
+find = {}
 
 [tool.setuptools.dynamic]
 dependencies = {file = "requirements.txt"}
@@ -31,6 +32,9 @@ test = {file = "requirements-test.txt"}
 
 [tool.setuptools_scm]
 write_to = "yamlcrypt/__version__.py"
+
+[project.scripts]
+yamlcrypt = "yamlcrypt.__main__:main"
 
 [tool.ruff]
 target-version = "py312"

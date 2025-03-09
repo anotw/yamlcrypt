@@ -1,3 +1,5 @@
+from importlib.metadata import PackageNotFoundError, version
+
 from yamlcrypt.config import YamlCryptConfig
 from yamlcrypt.errors import (
     YamlCryptConfigNotFoundError,
@@ -5,6 +7,11 @@ from yamlcrypt.errors import (
     YamlCryptError,
 )
 from yamlcrypt.yamlcrypt import YamlCrypt
+
+try:
+    __version__ = version("yamlcrypt")
+except PackageNotFoundError:
+    __version__ = "dev"
 
 __all__ = [
     "YamlCrypt",
