@@ -1,32 +1,14 @@
-import contextlib
-import os
 from pathlib import Path
-from types import SimpleNamespace
 
-import pyrage
 import pytest
 from ruamel.yaml import YAML
+from test_config import customized_env, default_test_config
 
-from yamlcrypt import YamlCrypt, YamlCryptError
+from yamlcrypt.config import YamlCryptConfig
+from yamlcrypt.errors import YamlCryptError
+from yamlcrypt.processor import YamlCryptProcessor, YamlCryptProcessorArgs
 
 TEST_DATA_PATH = Path(__file__).parent / "data"
-
-
-def default_test_config():
-    ident = pyrage.x25519.Identity.generate()
-    public = ident.to_public()
-    private = str(ident)
-    return f"""
-    yamlcrypt:
-      identities:
-        age:
-          public: '{public}'
-          private: '{private}'
-      rules:
-        - yamlpath: "some.path.with.*"
-          recipients:
-            - age
-    """
 
 
 def get_test_files(test_case):
@@ -49,32 +31,21 @@ def encryt_decrypt(tmp_path, config, test_path):
     with (tmp_path / "config.yaml").open("w", encoding="utf-8") as f:
         yaml.dump(config, f)
 
-    YamlCrypt(
-        args=SimpleNamespace(
-            config=tmp_path / "config.yaml",
-            input_file=test_path,
+    YamlCryptProcessor(
+        args=YamlCryptProcessorArgs(
+            input=test_path,
             output=tmp_path / "encrypted.yaml",
-        )
+        ),
+        config=YamlCryptConfig().load(tmp_path / "config.yaml"),
     ).encrypt()
 
-    YamlCrypt(
-        args=SimpleNamespace(
-            config=tmp_path / "config.yaml",
-            input_file=tmp_path / "encrypted.yaml",
+    YamlCryptProcessor(
+        args=YamlCryptProcessorArgs(
+            input=tmp_path / "encrypted.yaml",
             output=tmp_path / "decrypted.yaml",
-        )
+        ),
+        config=YamlCryptConfig().load(tmp_path / "config.yaml"),
     ).decrypt()
-
-
-@contextlib.contextmanager
-def customized_env(values):
-    env_backup = os.environ.copy()
-    try:
-        os.environ.update(values)
-        yield
-    finally:
-        os.environ.clear()
-        os.environ.update(env_backup)
 
 
 @pytest.mark.parametrize("test_file", get_test_files("test_encrypt_decrypt"))
@@ -83,12 +54,12 @@ def test_encrypt_decrypt(tmp_path, test_file):
 
     test_path = TEST_DATA_PATH / "test_encrypt_decrypt" / test_file
 
-    YamlCrypt(
-        args=SimpleNamespace(
-            config=tmp_path / "config.yaml",
-            input_file=test_path,
+    YamlCryptProcessor(
+        args=YamlCryptProcessorArgs(
+            input=test_path,
             output=tmp_path / "encrypted.yaml",
-        )
+        ),
+        config=YamlCryptConfig().load(tmp_path / "config.yaml"),
     ).encrypt()
 
     yaml = YAML(typ="safe")
@@ -98,12 +69,12 @@ def test_encrypt_decrypt(tmp_path, test_file):
     assert yaml_data["some"].get("path")
     assert yaml_data["some"]["path"].get("with")
 
-    YamlCrypt(
-        args=SimpleNamespace(
-            config=tmp_path / "config.yaml",
-            input_file=tmp_path / "encrypted.yaml",
+    YamlCryptProcessor(
+        args=YamlCryptProcessorArgs(
+            input=tmp_path / "encrypted.yaml",
             output=tmp_path / "decrypted.yaml",
-        )
+        ),
+        config=YamlCryptConfig().load(tmp_path / "config.yaml"),
     ).decrypt()
     print(str(tmp_path / "decrypted.yaml"))
 
@@ -129,12 +100,12 @@ def test_config_private_file(tmp_path):
     test_path = TEST_DATA_PATH / "test_encrypt_decrypt" / test_file
 
     config = yaml.load(default_test_config())
-    private = config["yamlcrypt"]["identities"]["age"]["private"]
+    private = config["yamlcrypt"]["identities"]["bla"]["private"]
 
     private_file = tmp_path / "private.key"
     private_file.write_text(f"# Some headings that should be ignored\n{private}\n")
 
-    config["yamlcrypt"]["identities"]["age"]["private"] = {"file": str(private_file)}
+    config["yamlcrypt"]["identities"]["bla"]["private"] = {"file": str(private_file)}
     encryt_decrypt(tmp_path=tmp_path, config=config, test_path=test_path)
     assert (tmp_path / "decrypted.yaml").read_text() == test_path.read_text()
 
@@ -146,12 +117,12 @@ def test_config_private_env_file(tmp_path):
     test_path = TEST_DATA_PATH / "test_encrypt_decrypt" / test_file
 
     config = yaml.load(default_test_config())
-    private = config["yamlcrypt"]["identities"]["age"]["private"]
+    private = config["yamlcrypt"]["identities"]["bla"]["private"]
 
     private_file = tmp_path / "private.key"
     private_file.write_text(f"# Some headings that should be ignored\n{private}\n")
 
-    config["yamlcrypt"]["identities"]["age"]["private"] = {
+    config["yamlcrypt"]["identities"]["bla"]["private"] = {
         "env": {"type": "path", "var": "MY_TEST_VAR"}
     }
     with customized_env({"MY_TEST_VAR": str(private_file)}):
@@ -166,9 +137,9 @@ def test_config_private_env_val(tmp_path):
     test_path = TEST_DATA_PATH / "test_encrypt_decrypt" / test_file
 
     config = yaml.load(default_test_config())
-    private = config["yamlcrypt"]["identities"]["age"]["private"]
+    private = config["yamlcrypt"]["identities"]["bla"]["private"]
 
-    config["yamlcrypt"]["identities"]["age"]["private"] = {
+    config["yamlcrypt"]["identities"]["bla"]["private"] = {
         "env": {"type": "key", "var": "MY_TEST_VAR"}
     }
     with customized_env({"MY_TEST_VAR": private}):
@@ -183,11 +154,11 @@ def test_config_private_default_env_val(tmp_path):
     test_path = TEST_DATA_PATH / "test_encrypt_decrypt" / test_file
 
     config = yaml.load(default_test_config())
-    private = config["yamlcrypt"]["identities"]["age"]["private"]
+    private = config["yamlcrypt"]["identities"]["bla"]["private"]
 
-    del config["yamlcrypt"]["identities"]["age"]["private"]
+    del config["yamlcrypt"]["identities"]["bla"]["private"]
 
-    with customized_env({"YAMLCRYPT_IDENTITIES_KEY_AGE": private}):
+    with customized_env({"YAMLCRYPT_IDENTITIES_KEY_BLA": private}):
         encryt_decrypt(tmp_path=tmp_path, config=config, test_path=test_path)
     assert (tmp_path / "decrypted.yaml").read_text() == test_path.read_text()
 
@@ -199,14 +170,14 @@ def test_config_private_default_env_file(tmp_path):
     test_path = TEST_DATA_PATH / "test_encrypt_decrypt" / test_file
 
     config = yaml.load(default_test_config())
-    private = config["yamlcrypt"]["identities"]["age"]["private"]
+    private = config["yamlcrypt"]["identities"]["bla"]["private"]
 
     private_file = tmp_path / "private.key"
     private_file.write_text(f"# Some headings that should be ignored\n{private}\n")
 
-    del config["yamlcrypt"]["identities"]["age"]["private"]
+    del config["yamlcrypt"]["identities"]["bla"]["private"]
 
-    with customized_env({"YAMLCRYPT_IDENTITIES_PATH_AGE": str(private_file)}):
+    with customized_env({"YAMLCRYPT_IDENTITIES_PATH_BLA": str(private_file)}):
         encryt_decrypt(tmp_path=tmp_path, config=config, test_path=test_path)
     assert (tmp_path / "decrypted.yaml").read_text() == test_path.read_text()
 
@@ -218,7 +189,7 @@ def test_config_no_public(tmp_path):
     test_path = TEST_DATA_PATH / "test_encrypt_decrypt" / test_file
 
     config = yaml.load(default_test_config())
-    del config["yamlcrypt"]["identities"]["age"]["public"]
+    del config["yamlcrypt"]["identities"]["bla"]["public"]
 
     encryt_decrypt(tmp_path=tmp_path, config=config, test_path=test_path)
     assert (tmp_path / "decrypted.yaml").read_text() == test_path.read_text()
@@ -231,29 +202,29 @@ def test_config_no_private(tmp_path):
     test_path = TEST_DATA_PATH / "test_encrypt_decrypt" / test_file
 
     config = yaml.load(default_test_config())
-    del config["yamlcrypt"]["identities"]["age"]["private"]
+    del config["yamlcrypt"]["identities"]["bla"]["private"]
 
     with (tmp_path / "config.yaml").open("w", encoding="utf-8") as f:
         yaml.dump(config, f)
 
-    YamlCrypt(
-        args=SimpleNamespace(
-            config=tmp_path / "config.yaml",
-            input_file=test_path,
+    YamlCryptProcessor(
+        args=YamlCryptProcessorArgs(
+            input=test_path,
             output=tmp_path / "encrypted.yaml",
-        )
+        ),
+        config=YamlCryptConfig().load(tmp_path / "config.yaml"),
     ).encrypt()
 
     with pytest.raises(YamlCryptError) as error:
-        YamlCrypt(
-            args=SimpleNamespace(
-                config=tmp_path / "config.yaml",
-                input_file=tmp_path / "encrypted.yaml",
+        YamlCryptProcessor(
+            args=YamlCryptProcessorArgs(
+                input=tmp_path / "encrypted.yaml",
                 output=tmp_path / "decrypted.yaml",
-            )
+            ),
+            config=YamlCryptConfig().load(tmp_path / "config.yaml"),
         ).decrypt()
     assert error.value.args[0] == "Could not find identity config"
-    assert error.value.args[1] == "age"
+    assert error.value.args[1] == "bla"
 
 
 def test_config_no_private_no_public(tmp_path):
@@ -263,19 +234,19 @@ def test_config_no_private_no_public(tmp_path):
     test_path = TEST_DATA_PATH / "test_encrypt_decrypt" / test_file
 
     config = yaml.load(default_test_config())
-    del config["yamlcrypt"]["identities"]["age"]["private"]
-    del config["yamlcrypt"]["identities"]["age"]["public"]
+    del config["yamlcrypt"]["identities"]["bla"]["private"]
+    del config["yamlcrypt"]["identities"]["bla"]["public"]
 
     with (tmp_path / "config.yaml").open("w", encoding="utf-8") as f:
         yaml.dump(config, f)
 
     with pytest.raises(YamlCryptError) as error:
-        YamlCrypt(
-            args=SimpleNamespace(
-                config=tmp_path / "config.yaml",
-                input_file=test_path,
+        YamlCryptProcessor(
+            args=YamlCryptProcessorArgs(
+                input=test_path,
                 output=tmp_path / "encrypted.yaml",
-            )
+            ),
+            config=YamlCryptConfig().load(tmp_path / "config.yaml"),
         ).encrypt()
     assert error.value.args[0] == "Could not find identity config"
-    assert error.value.args[1] == "age"
+    assert error.value.args[1] == "bla"

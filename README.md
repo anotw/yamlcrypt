@@ -6,9 +6,20 @@ As age uses public/private key encryption, this allows to use the tool in a repo
 public key allowing developers to define new variables, while using the private key only where the
 values are used.
 
+> Please beware that current config file format would allow to defined multiple recipients for a rule
+> this is not currently supported.
+
 ## Usage
 
 ### Config file
+
+Because `yamlcrypt` uses `age` asymmetric encryption, the private keys are not needed in the config
+file for the encryption scenarios.
+
+For the decryption scenarios, the private key do not need to be present in the config file. The key
+can be provided though a separate config file or and env variable.
+
+The below sections describe the different supported options.
 
 #### All values in the config
 
@@ -91,23 +102,38 @@ For example for an identity / recipient with the name `age` the default variable
   - `YAMLCRYPT_IDENTITIES_PATH_AGE`: The path to the private file for the identity `age`
   - `YAMLCRYPT_IDENTITIES_KEY_AGE`: The private key directly
 
+### Add a recipient
+
+For `yamlcrypt` to work it will need a config file with at least one recipient defined.
+Keys can be generated with the `age` CLI directly otherwise the `yamlcrypt` `recipient add` command
+can be used.
+
+To generate/add a key pair for the recipient `admin` use:
+
+```
+yamlcrypt --config /path/to/config.yaml recipient add admin
+yamlcrypt --config /path/to/config.yaml recipient add admin --key-file /path/to/admin.keyfile
+```
+
+> When no file already exist on the provided config file path then a default config file is generated.
+> If the file already existed the new recipient is simply added to the existing file.
 
 ### Encrypt
 
-```yaml
-yamlpage --config /path/to/config.yaml encrypt file.yaml
-YAMLPAGE_CONFIG=/path/to/config.yaml yamlpage encrypt file.yaml
+```console
+yamlcrypt --config /path/to/config.yaml encrypt file.yaml
+YAMLCRYPT_CONFIG=/path/to/config.yaml yamlcrypt encrypt file.yaml
 
-yamlpage --config /path/to/config.yaml encrypt --in-place file.yaml
-yamlpage --config /path/to/config.yaml encrypt --output encrypted.yaml file.yaml
+yamlcrypt --config /path/to/config.yaml encrypt --in-place file.yaml
+yamlcrypt --config /path/to/config.yaml encrypt --output encrypted.yaml file.yaml
 ```
 
 ### Decrypt
 
-```yaml
-yamlpage --config /path/to/config.yaml --age-key age.key decrypt file.yaml
-YAMLPAGE_CONFIG=/path/to/config.yaml YAMLPAGE_AGE_KEY=age.key yamlpage decrypt file.yaml
+```console
+yamlcrypt --config /path/to/config.yaml --age-key age.key decrypt file.yaml
+YAMLCRYPT_CONFIG=/path/to/config.yaml YAMLCRYPT_AGE_KEY=age.key yamlcrypt decrypt file.yaml
 
-yamlpage --config /path/to/config.yaml --age-key age.key decrypt --in-place file.yaml
-yamlpage --config /path/to/config.yaml --age-key age.key decrypt --output decrypted.yaml file.yaml
+yamlcrypt --config /path/to/config.yaml --age-key age.key decrypt --in-place file.yaml
+yamlcrypt --config /path/to/config.yaml --age-key age.key decrypt --output decrypted.yaml file.yaml
 ```
