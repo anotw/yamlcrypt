@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 *.py[cod]
 *$py.class
+*.egg-info
 
 __pycache__/
 .pytest_cache/
@@ -12,3 +13,4 @@ __pycache__/
 /.mypy_cache
 /htmlcov
 /.coverage
+/build

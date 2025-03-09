@@ -2,6 +2,7 @@ import argparse
 import os
 from pathlib import Path
 
+from yamlcrypt import __version__
 from yamlcrypt.yamlcrypt import YamlCrypt
 
 
@@ -39,7 +40,8 @@ class EnvDefaultAgeKey(argparse.Action):
 
 def main():
     parser = argparse.ArgumentParser(
-        prog="yamlcrypt", description="Encrypt and decrypt YAML files using page"
+        prog="yamlcrypt",
+        description=f"Encrypt and decrypt YAML files using page ({__version__})",
     )
 
     parser.add_argument(
