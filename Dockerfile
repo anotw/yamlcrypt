@@ -14,6 +14,9 @@ RUN --mount=type=bind,source=.,target=/src \
   && /opt/yamlcrypt/bin/pip install /tmp/build/yamlcrypt
 
 FROM python:3.12-alpine
+LABEL org.opencontainers.image.source=https://github.com/anotw/yamlcrypt
+LABEL org.opencontainers.image.description="A simple CLI to encrypt data in yaml files"
+LABEL org.opencontainers.image.licenses=MIT
 
 ARG LIBGCC_VERSION=14.2.0-r4
 RUN apk upgrade --no-cache \
