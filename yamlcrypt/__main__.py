@@ -5,37 +5,7 @@ from pathlib import Path
 from yamlcrypt import __version__
 from yamlcrypt.yamlcrypt import YamlCrypt
 
-
-class EnvDefaultConfig(argparse.Action):
-    """Custom argparse Action that defaults to the environment variable YAMLCRYPT_CONFIG."""
-
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        super().__init__(option_strings, dest, nargs, **kwargs)
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        if values is None:
-            values = os.getenv("YAMLCRYPT_CONFIG")
-        if values is None:
-            parser.error(
-                "Error: Missing required 'config' argument. Please specify --config or set YAMLCRYPT_CONFIG environment variable."
-            )
-        setattr(namespace, self.dest, Path(values))
-
-
-class EnvDefaultAgeKey(argparse.Action):
-    """Custom argparse Action that defaults to the environment variable AGE_KEY."""
-
-    def __init__(self, option_strings, dest, nargs=None, **kwargs):
-        super().__init__(option_strings, dest, nargs, **kwargs)
-
-    def __call__(self, parser, namespace, values, option_string=None):
-        if values is None:
-            values = os.getenv("YAMLCRYPT_AGE_KEY")
-        if values is None:
-            parser.error(
-                "Error: Missing required 'age-key' argument. Please specify --age-key or set YAMLCRYPT_AGE_KEY environment variable."
-            )
-        setattr(namespace, self.dest, Path(values))
+DEFAULT_CONFIG = ".yamlcrypt.yaml"
 
 
 def main():
@@ -46,27 +16,27 @@ def main():
 
     parser.add_argument(
         "--config",
-        action=EnvDefaultConfig,
-        help="Path to the config.yaml file (can also be set via YAMLCRYPT_CONFIG environment variable)",
+        default=Path(os.getenv("YAMLCRYPT_CONFIG", DEFAULT_CONFIG)),
+        help=(
+            "Path to the config.yaml file"
+            " It can also be set via YAMLCRYPT_CONFIG environment variable"
+            " (default: %(default)s)"
+        ),
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Commands")
 
     # Encrypt command
     encrypt_parser = subparsers.add_parser("encrypt", help="Encrypt a YAML file")
+    encrypt_parser.add_argument("--output", type=Path, help="Path to save the encrypted file")
     encrypt_parser.add_argument("input", type=Path, help="The input YAML file to encrypt")
-    group = encrypt_parser.add_mutually_exclusive_group(required=False)
-    group.add_argument("--output", type=Path, help="Path to save the encrypted file")
-    group.add_argument("--in-place", action="store_true", help="Encrypt the file in place")
 
     encrypt_parser.set_defaults(func=lambda args: YamlCrypt(args).encrypt())
 
     # Decrypt command
     decrypt_parser = subparsers.add_parser("decrypt", help="Decrypt a YAML file")
+    decrypt_parser.add_argument("--output", type=Path, help="Path to save the decrypted file")
     decrypt_parser.add_argument("input", type=Path, help="The input YAML file to decrypt")
-    group = decrypt_parser.add_mutually_exclusive_group(required=False)
-    group.add_argument("--output", type=Path, help="Path to save the decrypted file")
-    group.add_argument("--in-place", action="store_true", help="Decrypt the file in place")
 
     decrypt_parser.set_defaults(func=lambda args: YamlCrypt(args).decrypt())
 
