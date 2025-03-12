@@ -138,3 +138,14 @@ interpreted as the private key itself.
 For example for an identity / recipient with the name `age` the default variables would be:
   - `YAMLCRYPT_IDENTITIES_PATH_AGE`: The path to the private file for the identity `age`
   - `YAMLCRYPT_IDENTITIES_KEY_AGE`: The private key directly
+
+## Docker
+
+The `yamlcrypt` CLI is as well pre-built inside the docker image `ghcr.io/anotw/yamlcrypt`.
+
+In order to use it the location of the config file and the files to be encrypted must be mounted
+as volumes.
+
+```console
+$ docker run -it --rm -v $PWD:$PWD -w $PWD ghcr.io/anotw/yamlcrypt encrypt $PWD/file.yaml
+```
