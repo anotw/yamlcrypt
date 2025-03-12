@@ -1,0 +1,8 @@
+-   id: yamlcrypt
+    name: Ensure configured yamlcrypt encryption is applied
+    description: |
+      This hook runs the yamlcrypt tool to ensure the configured yaml files
+      were indeed encrypted according to the given yamlcrypt config.
+    entry: yamlcrypt encrypt
+    language: python
+    types: [file, yaml]
