@@ -31,7 +31,6 @@ def decrypt_value(value, identities):
 @dataclass
 class YamlCryptProcessorArgs:
     input: Path
-    in_place: bool = True
     output: Path | None = None
 
 
@@ -61,11 +60,13 @@ class YamlCryptProcessor:
                 yield rule, node_coordinate
 
     def encrypt(self):
+        should_dump = False
         for rule, node_coordinate in self.__iterate_nodes():
             starts = f"{rule.markup}["
             if isinstance(node_coordinate.node, str) and not node_coordinate.node.startswith(
                 starts
             ):
+                should_dump = True
                 encrypted = encrypt_value(
                     YamlCryptNode.from_node_coordinate(
                         node_coordinate=node_coordinate, lines=self.lines
@@ -75,9 +76,11 @@ class YamlCryptProcessor:
                 node_coordinate.parent[node_coordinate.parentref] = LiteralScalarString(
                     split_string_at_width(f"{rule.markup}[{encrypted}]")
                 )
-        self.dump()
+        if should_dump:
+            self.dump()
 
     def decrypt(self):
+        should_dump = False
         for rule, node_coordinate in self.__iterate_nodes():
             starts = f"{rule.markup}["
             ends = "]"
@@ -86,6 +89,7 @@ class YamlCryptProcessor:
                 and node_coordinate.node.startswith(starts)
                 and node_coordinate.node.endswith(ends)
             ):
+                should_dump = True
                 decrypted = decrypt_value(
                     (node_coordinate.node[len(f"{rule.markup}[") : -1]).replace("\n", ""),
                     [self._config.identity(name=recipient) for recipient in rule.recipients],
@@ -99,12 +103,11 @@ class YamlCryptProcessor:
         def post_process(data):
             return data.replace("\\n", "")
 
-        self.dump(post_process=post_process)
+        if should_dump:
+            self.dump(post_process=post_process)
 
     def dump(self, post_process=None):
-        path = self._args.output
-        if not path and self._args.in_place:
-            path = self._args.input
+        path = self._args.output or self._args.input
 
         def strip_document_end_marker(s):
             if not self.yaml.explicit_end and s.endswith("...\n"):
@@ -118,7 +121,4 @@ class YamlCryptProcessor:
         if post_process:
             ret = strip_document_end_marker(post_process(ret))
 
-        if path:
-            path.write_text(ret)
-        else:
-            print(ret)
+        path.write_text(ret)
