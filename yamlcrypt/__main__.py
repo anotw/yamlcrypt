@@ -8,6 +8,13 @@ from yamlcrypt.yamlcrypt import YamlCrypt
 DEFAULT_CONFIG = ".yamlcrypt.yaml"
 
 
+class CheckOutputAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        if getattr(namespace, "output", None) and len(values or []) != 1:
+            parser.error("When --output is used, input should have exactly one argument.")
+        setattr(namespace, self.dest, values)
+
+
 def main():
     parser = argparse.ArgumentParser(
         prog="yamlcrypt",
@@ -16,6 +23,7 @@ def main():
 
     parser.add_argument(
         "--config",
+        type=Path,
         default=Path(os.getenv("YAMLCRYPT_CONFIG", DEFAULT_CONFIG)),
         help=(
             "Path to the config.yaml file"
@@ -28,15 +36,35 @@ def main():
 
     # Encrypt command
     encrypt_parser = subparsers.add_parser("encrypt", help="Encrypt a YAML file")
-    encrypt_parser.add_argument("--output", type=Path, help="Path to save the encrypted file")
-    encrypt_parser.add_argument("input", type=Path, help="The input YAML file to encrypt")
+    encrypt_parser.add_argument(
+        "--output",
+        type=Path,
+        help=("Path to save the encrypted file (When used input should have exactly one value)"),
+    )
+    encrypt_parser.add_argument(
+        "input",
+        nargs="+",
+        type=Path,
+        action=CheckOutputAction,
+        help="The input YAML file to encrypt",
+    )
 
     encrypt_parser.set_defaults(func=lambda args: YamlCrypt(args).encrypt())
 
     # Decrypt command
     decrypt_parser = subparsers.add_parser("decrypt", help="Decrypt a YAML file")
-    decrypt_parser.add_argument("--output", type=Path, help="Path to save the decrypted file")
-    decrypt_parser.add_argument("input", type=Path, help="The input YAML file to decrypt")
+    decrypt_parser.add_argument(
+        "--output",
+        type=Path,
+        help=("Path to save the encrypted file (When used input should have exactly one value)"),
+    )
+    decrypt_parser.add_argument(
+        "input",
+        nargs="+",
+        action=CheckOutputAction,
+        type=Path,
+        help="The input YAML file to encrypt",
+    )
 
     decrypt_parser.set_defaults(func=lambda args: YamlCrypt(args).decrypt())
 

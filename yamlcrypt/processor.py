@@ -43,7 +43,7 @@ class YamlCryptProcessor:
 
         (self.yaml_data, doc_loaded) = Parsers.get_yaml_data(self.yaml, self._log, args.input)
         if not doc_loaded:
-            raise YamlCryptError("Could not load config file")
+            raise YamlCryptError("Could not load input file", str(args.input))
 
         self.processor = YAMLProcessor(self._log, self.yaml_data)
         self.lines = args.input.read_text().splitlines()
