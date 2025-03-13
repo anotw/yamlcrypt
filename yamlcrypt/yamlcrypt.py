@@ -1,8 +1,7 @@
 from yamlcrypt.config import YamlCryptConfig
-from yamlcrypt.errors import YamlCryptConfigNotFoundError
+from yamlcrypt.errors import YamlCryptConfigNotFoundError, YamlCryptError
 from yamlcrypt.logger import logger
 from yamlcrypt.processor import YamlCryptProcessor, YamlCryptProcessorArgs
-from yamlcrypt.utils import namespace_to_dataclass
 
 
 class YamlCrypt:
@@ -10,7 +9,8 @@ class YamlCrypt:
         self.args = args
         self.log = logger()
         self._config = None
-        self._processor = None
+        if self.args.output and len(self.args.input) != 1:
+            raise YamlCryptError("When --output is used, input should have exactly one argument.")
 
     @property
     def config(self):
@@ -18,19 +18,20 @@ class YamlCrypt:
             self._config = YamlCryptConfig(self.log).load(path=self.args.config)
         return self._config
 
-    @property
-    def processor(self):
-        if not self._processor:
-            self._processor = YamlCryptProcessor(
-                args=namespace_to_dataclass(self.args, YamlCryptProcessorArgs), config=self.config
+    def processors(self):
+        for input in self.args.input:
+            yield YamlCryptProcessor(
+                args=YamlCryptProcessorArgs(input=input, output=self.args.output),
+                config=self.config,
             )
-        return self._processor
 
     def encrypt(self):
-        self.processor.encrypt()
+        for processor in self.processors():
+            processor.encrypt()
 
     def decrypt(self):
-        self.processor.decrypt()
+        for processor in self.processors():
+            processor.decrypt()
 
     def recipient_add(self):
         # Create config file without loading so we can catch the error
