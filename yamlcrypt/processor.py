@@ -56,7 +56,7 @@ class YamlCryptProcessor:
 
     def __iterate_nodes(self):
         for rule in self._config.iterate_rules():
-            for node_coordinate in self.processor.get_nodes(rule.yaml_path, mustexist=True):
+            for node_coordinate in self.processor.get_nodes(rule.yaml_path, mustexist=False):
                 yield rule, node_coordinate
 
     def encrypt(self):
