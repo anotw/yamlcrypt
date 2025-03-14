@@ -1,10 +1,17 @@
-import ez_yaml
+from ruamel.yaml import YAML
 from ruamel.yaml.scalarstring import (
     DoubleQuotedScalarString,
     FoldedScalarString,
     LiteralScalarString,
     SingleQuotedScalarString,
 )
+
+
+def get_yaml():
+    yaml = YAML(typ=["rt", "string"])
+    yaml.explicit_end = False
+    yaml.explicit_start = False
+    return yaml
 
 
 class YamlCryptNode:
@@ -17,7 +24,7 @@ class YamlCryptNode:
 
     @classmethod
     def from_string(cls, data):
-        obj = ez_yaml.to_object(data)
+        obj = get_yaml().load(data)
         return cls(style=obj["s"], data=obj["d"], fold_pos=obj.get("f"))
 
     @classmethod
@@ -68,7 +75,7 @@ class YamlCryptNode:
         return d
 
     def to_string(self):
-        return ez_yaml.to_string(self.to_dict())
+        return get_yaml().dump_to_string(self.to_dict(), add_final_eol=False)
 
     def to_rueyaml(self):
         fct = None
