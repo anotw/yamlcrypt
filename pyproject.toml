@@ -36,6 +36,15 @@ write_to = "yamlcrypt/__version__.py"
 [project.scripts]
 yamlcrypt = "yamlcrypt.__main__:main"
 
+[tool.uv]
+# The dependencies are read from the requirements files, which uv does not track: list them so an
+# edit to a pin invalidates uv's cached metadata. This replaces uv's default keys, hence pyproject.toml.
+cache-keys = [
+  { file = "pyproject.toml" },
+  { file = "requirements.txt" },
+  { file = "requirements-tests.txt" },
+]
+
 [tool.ruff]
 target-version = "py312"
 line-length = 100
