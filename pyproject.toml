@@ -15,7 +15,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 license = {file = "LICENSE"}
-dynamic = ["version", "dependencies"]
+dynamic = ["version", "dependencies", "optional-dependencies"]
 
 [project.urls]
 Homepage = "https://github.com/anotw/yamlcrypt"
@@ -28,7 +28,7 @@ find = {}
 dependencies = {file = "requirements.txt"}
 
 [tool.setuptools.dynamic.optional-dependencies]
-test = {file = "requirements-test.txt"}
+test = {file = "requirements-tests.txt"}
 
 [tool.setuptools_scm]
 write_to = "yamlcrypt/__version__.py"
