@@ -1,7 +1,7 @@
-FROM python:3.12-alpine AS build
+FROM python:3.12-alpine3.23 AS build
 
-ARG GIT_VERSION=2.47.2-r0
-ARG CARGO_VERSION=1.83.0-r0
+ARG GIT_VERSION=2.52.1-r0
+ARG CARGO_VERSION=1.91.1-r2
 RUN apk upgrade --no-cache \
   && apk add --no-cache \
     git=$GIT_VERSION\
@@ -13,12 +13,12 @@ RUN --mount=type=bind,source=.,target=/src \
   && python -m venv /opt/yamlcrypt \
   && /opt/yamlcrypt/bin/pip install /tmp/build/yamlcrypt
 
-FROM python:3.12-alpine
+FROM python:3.12-alpine3.23
 LABEL org.opencontainers.image.source=https://github.com/anotw/yamlcrypt
 LABEL org.opencontainers.image.description="A simple CLI to encrypt data in yaml files"
 LABEL org.opencontainers.image.licenses=MIT
 
-ARG LIBGCC_VERSION=14.2.0-r4
+ARG LIBGCC_VERSION=15.2.0-r2
 RUN apk upgrade --no-cache \
    && apk add --no-cache \
     libgcc=$LIBGCC_VERSION
